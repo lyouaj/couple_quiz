@@ -42,6 +42,7 @@ Map<String, Map<String, String>> translations = {
     'noMatch': 'No Match',
     'chooseLang': 'Choose Language',
     'score': 'Score',
+    'selectAnswerPrompt': 'Please select an answer',
     // Categories
     'preferences': 'Preferences',
     'relationship': 'Relationship',
@@ -186,6 +187,7 @@ Map<String, Map<String, String>> translations = {
     'noMatch': 'Pas de Match',
     'chooseLang': 'Choisissez la Langue',
     'score': 'Score',
+    'selectAnswerPrompt': 'Veuillez sélectionner une réponse',
     // Categories
     'preferences': 'Préférences',
     'relationship': 'Relation',
@@ -330,6 +332,7 @@ Map<String, Map<String, String>> translations = {
     'noMatch': 'عدم تطابق',
     'chooseLang': 'اختر اللغة',
     'score': 'النتيجة',
+    'selectAnswerPrompt': 'الرجاء اختيار إجابة',
     // Categories
     'preferences': 'التفضيلات',
     'relationship': 'العلاقة',
@@ -1125,7 +1128,18 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   void _submitAnswer({bool timeOut = false}) {
-    if (_selectedAnswer.isEmpty) {
+    if (timeOut) {
+      // For timeout, select the first option and continue
+      _selectedAnswer = _questions[_currentQuestionIndex].optionKeys[0];
+      
+      // Show timeout message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Time out! First option selected automatically.'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    } else if (_selectedAnswer.isEmpty) {
       // Show error message if no answer is selected
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1189,7 +1203,7 @@ class _QuizPageState extends State<QuizPage> {
           language: widget.language,
           questions: _questions,
           score: _score,
-          maxScore: _questions.length * 10,
+          maxScore: _questions.length,
         ),
       ),
     );
@@ -1272,7 +1286,7 @@ class _QuizPageState extends State<QuizPage> {
                   style: const TextStyle(fontSize: 18),
                 ),
                 Chip(
-                  label: Text(translate(_questions[_currentQuestionIndex].categoryKey, widget.language)),
+                  label: Text(translate(_questions[_currentQuestionIndex].categoryKey, widget.language.code)),
                   backgroundColor: accentColor.withOpacity(0.2),
                 ),
               ],
